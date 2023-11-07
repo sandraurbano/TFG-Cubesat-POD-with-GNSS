@@ -6,7 +6,7 @@ clc; clear; close all;
 %% Specify Simulation Parameters
 
 % Navigation files
-file = 'GNSSfiles/GODS00USA_R_20210260000_01D_GN.rnx';
+file = '/Data/GNSSfiles/GODS00USA_R_20210260000_01D_GN.rnx';
 gnssFileType = 'RINEX'; % message file type (RINEX,SEM,YUCA)
 
 % Orbit simulation output data
