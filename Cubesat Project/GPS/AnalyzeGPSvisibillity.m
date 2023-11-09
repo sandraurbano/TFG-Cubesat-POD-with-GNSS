@@ -6,22 +6,35 @@ clc; clear; close all;
 %% Specify Simulation Parameters
 
 % Navigation files
-file = '/Data/GNSSfiles/GODS00USA_R_20210260000_01D_GN.rnx';
+file = 'Data/GNSSfiles/GODS00USA_R_20210260000_01D_GN.rnx';
 gnssFileType = 'RINEX'; % message file type (RINEX,SEM,YUCA)
 
 % Orbit simulation output data
-load('orbit_simResults.mat');
-sim_Lat = out.Geodetic_LatLon(:,1);
-sim_Lon = out.Geodetic_LatLon(:,2);
-sim_alt = out.Geodetic_alt;
+load('Data/orbitSimOutput.mat')
 
 % GPS simulation parameters
-startTime = datetime(2023,11,02,12,00,00);      % Start time
-numHours = 24;                                  % Simulation duration [h]
-dt = 60;                                        % Time between samples [s]
-lat = sim_Lat(1);                               % Geodetic latittude [deg]
-lon = sim_Lon(1);                               % Geodetic longitude [deg]
-alt = sim_alt(1);                               % Geodetic altittude [m]
+startTime = mission.StartDate;                  % Start time
+numHours = mission.Duration;                    % Simulation duration [h]
+dt = 5;                                         % Time between samples [s]
+
+timeElapsed = 0:dt:seconds(numHours);
+t = startTime + seconds(timeElapsed);
+stopTime = t(end);
+
+% CubeSat location
+mission.CubeSat.TimeseriesLatLon = mission.SimOutput.yout{5}.Values;
+mission.CubeSat.TimeseriesAlt = mission.SimOutput.yout{6}.Values;
+
+mission.CubeSat.TimeseriesLatLon = setuniformtime(mission.CubeSat.TimeseriesLatLon,...
+    'StartTime',0,'EndTime',seconds(mission.Duration));
+mission.CubeSat.TimeseriesAlt = setuniformtime(mission.CubeSat.TimeseriesAlt,...
+    'StartTime',0,'EndTime',seconds(mission.Duration));
+
+idx_time = 10;
+queryTime = t(idx_time);
+lat = mission.SimOutput.yout{5}.Values.Data(idx_time,1);    % Geodetic latittude [deg]
+lon = mission.SimOutput.yout{5}.Values.Data(idx_time,2);    % Geodetic longitude [deg]
+alt = mission.SimOutput.yout{6}.Values.Data(idx_time);                % Geodetic altittude [m]
 recPos = [lat lon alt];                         % Receiver position vector
 MaskAngle = 0;                                  % Mask angle of the receiver
 
@@ -33,10 +46,6 @@ MaskAngle = 0;                                  % Mask angle of the receiver
 % Aim: generate the satellite visibilities as a matrix of logical values. 
 % Each row in the matrix corresponds to a time step, and each column 
 % corresponds to a satellite. 
-
-secondsPerHour = 3600;
-timeElapsed = 0:dt:(secondsPerHour*numHours);
-t = startTime + seconds(timeElapsed);
 
 numSats = numel(satIDs);
 numSamples = numel(t);
@@ -120,3 +129,20 @@ xlabel("Time")
 ylabel("Number of satellites visible")
 title("Number of GPS satellites visible")
 axis tight
+
+%% Satellite scenario 
+
+scenario = satelliteScenario(startTime,stopTime,dt);
+
+RINEXdata = rinexread(file); 
+GPSsat = satellite(scenario,RINEXdata);
+CubeSat = groundStation(scenario,lat,lon,MinElevationAngle=MaskAngle);
+
+ac = access(GPSsat,CubeSat);
+v = satelliteScenarioViewer(scenario,CurrentTime=queryTime,ShowDetails=false);
+campos(v,CubeSat.Latitude,CubeSat.Longitude,CubeSat.Altitude+6e7);
+
+
+
+
+

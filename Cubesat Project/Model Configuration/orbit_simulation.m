@@ -2,12 +2,11 @@
 clc; clear; close all; 
 
 % Define global parameters  
-% mu = 3.986*10^5;      % Gravitational parameter [km^3/s^2]
-% r_earth = 6378;       % Radius of Earth [km]
+Earth.mu = 3.986*10^14;      % Gravitational parameter of Earth [m^3/s^2]
+Earth.radius = 6378*10^3;   % Radius of Earth [m]
 
-% Define simulation parameters
+% Define simulation start date
 mission.StartDate = datetime(2019, 1, 1, 12, 0, 0);
-mission.Duration  = hours(6);
 
 % Keplerian orbital elements for the CubeSat at the mission.StartDate.
 mission.CubeSat.EpochDate = datetime(2020, 1, 1, 12, 0, 0);
@@ -22,6 +21,9 @@ mission.CubeSat.TrueAnomaly    = 202.9234;   % [deg]
 mission.CubeSat.Euler = [0 0 0];             % [deg]
 mission.CubeSat.AngularRate = [0 0 0];       % [deg/s]
 
+% Simulation duration for 1 orbit
+mission.Period = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); %[s]
+mission.Duration  = hours(mission.Period/3600);
 
 % Open simulaiton
 mission.mdl = "CubeSat_model";
@@ -64,8 +66,9 @@ set_param(mission.mdl, ...
 set_param(mission.mdl, ...
     "SaveOutput", "on", ...
     "OutputSaveName", "yout", ...
-    "SaveFormat", "Dataset");
+    "SaveFormat", "Dataset",...
+    "DatasetSignalFormat", "timeseries");
 
 % Run the Model and Collect Satellite Ephemerides
 mission.SimOutput = sim(mission.mdl);
-save('../Data/orbitSimOutput.mat','mission');
+save('Data/orbitSimOutput.mat','mission');
