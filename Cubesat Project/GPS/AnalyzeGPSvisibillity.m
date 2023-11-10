@@ -12,31 +12,40 @@ gnssFileType = 'RINEX'; % message file type (RINEX,SEM,YUCA)
 % Orbit simulation output data
 load('Data/orbitSimOutput.mat')
 
-% GPS simulation parameters
-startTime = mission.StartDate;                  % Start time
-numHours = mission.Duration;                    % Simulation duration [h]
-dt = 5;                                         % Time between samples [s]
 
-timeElapsed = 0:dt:seconds(numHours);
-t = startTime + seconds(timeElapsed);
-stopTime = t(end);
+% Uniform time vector 
+mission.CubeSat.TimeseriesXecef = mission.SimOutput.yout{1}.Values;
+mission.CubeSat.TimeseriesVecef = mission.SimOutput.yout{2}.Values;
+mission.CubeSat.TimeseriesLatLon = mission.SimOutput.yout{6}.Values;
+mission.CubeSat.TimeseriesAlt = mission.SimOutput.yout{7}.Values;
 
-% CubeSat location
-mission.CubeSat.TimeseriesLatLon = mission.SimOutput.yout{5}.Values;
-mission.CubeSat.TimeseriesAlt = mission.SimOutput.yout{6}.Values;
-
+mission.CubeSat.TimeseriesXecef = setuniformtime(mission.CubeSat.TimeseriesXecef,...
+    'StartTime',0,'EndTime',seconds(mission.Duration));
+mission.CubeSat.TimeseriesVecef = setuniformtime(mission.CubeSat.TimeseriesVecef,...
+    'StartTime',0,'EndTime',seconds(mission.Duration));
 mission.CubeSat.TimeseriesLatLon = setuniformtime(mission.CubeSat.TimeseriesLatLon,...
     'StartTime',0,'EndTime',seconds(mission.Duration));
 mission.CubeSat.TimeseriesAlt = setuniformtime(mission.CubeSat.TimeseriesAlt,...
     'StartTime',0,'EndTime',seconds(mission.Duration));
 
-idx_time = 10;
+% GPS simulation parameters
+startTime = mission.StartDate;                  % Start time
+numHours = mission.Duration;                    % Simulation duration [h]
+
+timeElapsed = mission.SimOutput.yout{6}.Values.Time;
+t = startTime + seconds(timeElapsed);
+stopTime = t(end);
+dt = timeElapsed(2)-timeElapsed(1);            % Time between samples [s]
+
+
+% CubeSAt location for a specific point
+idx_time = 100;
 queryTime = t(idx_time);
-lat = mission.SimOutput.yout{5}.Values.Data(idx_time,1);    % Geodetic latittude [deg]
-lon = mission.SimOutput.yout{5}.Values.Data(idx_time,2);    % Geodetic longitude [deg]
-alt = mission.SimOutput.yout{6}.Values.Data(idx_time);                % Geodetic altittude [m]
-recPos = [lat lon alt];                         % Receiver position vector
-MaskAngle = 0;                                  % Mask angle of the receiver
+lat = mission.CubeSat.TimeseriesLatLon.Data(idx_time,1);    % Geodetic latittude [deg]
+lon = mission.CubeSat.TimeseriesLatLon.Data(idx_time,2);    % Geodetic longitude [deg]
+alt = mission.CubeSat.TimeseriesAlt.Data(idx_time);         % Geodetic altittude [m]
+recPos = [lat lon alt];                                     % Receiver position vector
+MaskAngle = 0;                                              % Mask angle of the receiver
 
 
 %% Get Satellite Orbital Parameters
@@ -130,17 +139,9 @@ ylabel("Number of satellites visible")
 title("Number of GPS satellites visible")
 axis tight
 
-%% Satellite scenario 
 
-scenario = satelliteScenario(startTime,stopTime,dt);
 
-RINEXdata = rinexread(file); 
-GPSsat = satellite(scenario,RINEXdata);
-CubeSat = groundStation(scenario,lat,lon,MinElevationAngle=MaskAngle);
 
-ac = access(GPSsat,CubeSat);
-v = satelliteScenarioViewer(scenario,CurrentTime=queryTime,ShowDetails=false);
-campos(v,CubeSat.Latitude,CubeSat.Longitude,CubeSat.Altitude+6e7);
 
 
 

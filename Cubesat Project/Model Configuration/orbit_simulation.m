@@ -72,3 +72,11 @@ set_param(mission.mdl, ...
 % Run the Model and Collect Satellite Ephemerides
 mission.SimOutput = sim(mission.mdl);
 save('Data/orbitSimOutput.mat','mission');
+
+% Create a txt with simulator output data
+spirent(mission)
+
+
+
+
+
