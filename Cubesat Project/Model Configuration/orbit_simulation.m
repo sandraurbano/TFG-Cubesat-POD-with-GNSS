@@ -6,10 +6,10 @@ Earth.mu = 3.986*10^14;      % Gravitational parameter of Earth [m^3/s^2]
 Earth.radius = 6378*10^3;   % Radius of Earth [m]
 
 % Define simulation start date
-mission.StartDate = datetime(2019, 1, 1, 12, 0, 0);
+mission.StartDate = datetime(2021, 1, 26, 0, 0, 0);
 
 % Keplerian orbital elements for the CubeSat at the mission.StartDate.
-mission.CubeSat.EpochDate = datetime(2020, 1, 1, 12, 0, 0);
+mission.CubeSat.EpochDate = datetime(2022, 10, 26, 0, 0, 0);
 mission.CubeSat.SemiMajorAxis  = 6786233.13; % [m]
 mission.CubeSat.Eccentricity   = 0.0010537;
 mission.CubeSat.Inclination    = 51.7519;    % [deg]
@@ -75,7 +75,6 @@ save('Data/orbitSimOutput.mat','mission');
 
 % Create a txt with simulator output data
 spirent(mission)
-
 
 
 
