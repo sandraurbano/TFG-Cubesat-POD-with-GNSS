@@ -29,8 +29,8 @@ samplingFreq = 2000000;
 
 for ch=1:channels
     filenm = sprintf('trk_dump_ch%i.mat',ch);
-    data = load([tracking_path filenm]);
-    Tracking_plot(data,samplingFreq)
+    TRK = load([tracking_path filenm]);
+    Tracking_plot(TRK,samplingFreq)
 end 
 
 

@@ -33,26 +33,28 @@ mission.CubeSat.GeodeticCoord = timeseries2timetable(mission.CubeSat.TimeseriesL
 % Load the Satellite Ephemerides into a satelliteScenario Object
 % Create a satellite scenario object to use during the analysis
 
- scenario = satelliteScenario;
-% cubesat = satellite(scenario, mission.CubeSat.TimeseriesPosECEF, mission.CubeSat.TimeseriesVelECEF, ...
-%     "CoordinateFrame", "ecef",'Name','CubeSat');
-% disp(scenario)
-% 
-% % Set camera target = cubesat
-% v = satelliteScenarioViewer(scenario);
-% play(scenario,"Viewer",v);
-% %camtarget(v,cubesat)
-% 
-% RINEXdata = rinexread(file); 
-% GPSsat = satellite(scenario,RINEXdata);
+scenario = satelliteScenario;
+cubesat = satellite(scenario, mission.CubeSat.TimeseriesPosECEF, mission.CubeSat.TimeseriesVelECEF, ...
+    "CoordinateFrame", "ecef",'Name','CubeSat');
+set(cubesat.Orbit, LineColor="m");
+disp(scenario)
+
+% Set camera target = cubesat
+v = satelliteScenarioViewer(scenario);
+play(scenario,"Viewer",v);
+%camtarget(v,cubesat)
+
+RINEXdata = rinexread(file); 
+GPSsat = satellite(scenario,RINEXdata);
+
 
 %% Satellite scenario 
 %scenario = satelliteScenario(startTime,stopTime,dt);
-RINEXdata = rinexread(file); 
-GPSsat = satellite(scenario,RINEXdata);
-CubeSat = satellite(scenario, mission.CubeSat.TimeseriesPosECEF, mission.CubeSat.TimeseriesVelECEF, ...
-     "CoordinateFrame", "ecef",'Name','CubeSat');
-ac = access(GPSsat,CubeSat);
+% RINEXdata = rinexread(file); 
+% GPSsat = satellite(scenario,RINEXdata);
+% CubeSat = satellite(scenario, mission.CubeSat.TimeseriesPosECEF, mission.CubeSat.TimeseriesVelECEF, ...
+%      "CoordinateFrame", "ecef",'Name','CubeSat');
+% ac = access(GPSsat,CubeSat);
 %v = satelliteScenarioViewer(scenario,ShowDetails=false);
 
 %v = satelliteScenarioViewer(scenario,CurrentTime=queryTime,ShowDetails=false);
