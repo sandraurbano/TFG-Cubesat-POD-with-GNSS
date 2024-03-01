@@ -22,8 +22,10 @@ mission.CubeSat.Euler = [0 0 0];             % [deg]
 mission.CubeSat.AngularRate = [0 0 0];       % [deg/s]
 
 % Simulation duration for 1 orbit
-mission.Period = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); %[s]
-mission.Duration  = hours(mission.Period/3600);
+% mission.Period = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); %[s]
+% mission.Duration  = hours(mission.Period/3600);
+
+mission.Duration  = hours(0.25);
 
 % Open simulaiton
 mission.mdl = "CubeSat_model";
@@ -56,11 +58,13 @@ set_param(mission.CubeSat.blk, ...
 
 % For best performance and accuracy when using a numerical propagator, use a variable-step solver.
 set_param(mission.mdl, ...
-    "SolverType", "Variable-step", ...
-    "SolverName", "VariableStepAuto", ...
+    "SolverType", "Fixed-step", ...
+    "FixedStep",  "0.1",...
     "RelTol",     "1e-6", ...
     "AbsTol",     "1e-7", ...
     "StopTime",  string(seconds(mission.Duration)));
+    %"SolverType", "Variable-step", ...
+    % "SolverName", "VariableStepAuto", ...
 
 
 % Save model output port data as a dataset of time series objects.
@@ -75,7 +79,7 @@ mission.SimOutput = sim(mission.mdl);
 save('Data/orbitSimOutput.mat','mission');
 
 %% Create a txt with simulator output data
-disp('savedata')
+disp('data saved')
 spirent(mission)
 
 
