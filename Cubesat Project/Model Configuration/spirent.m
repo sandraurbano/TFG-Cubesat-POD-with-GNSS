@@ -1,4 +1,4 @@
-function spirent(mission)
+function spirent(mission,name)
 % Create a txt with simulator output data
 
 %% Process Data for Spirent
@@ -22,7 +22,9 @@ V1 = repmat({'v1_M1'}, 1, length(Data.t));
 
 T = table(Data.t,MOT', V1', Data.PosECEF(:,1), Data.PosECEF(:,2) , Data.PosECEF(:,3),...
     Data.Vel(:,1), Data.Vel(:,2), Data.Vel(:,3));
-% Write the table to a CSV file
-writetable(T,'Data/Cubesat_PosECEF_Vel.txt','WriteMode','overwrite');
+% Write the table to a txt file
+
+file = ['Data/Cubesat_PosECEF_Vel_' name '.txt'];
+writetable(T,file,'WriteMode','overwrite');
 
 end
