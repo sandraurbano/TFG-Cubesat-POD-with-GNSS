@@ -1,6 +1,8 @@
 
 clc; clear; close all; 
 
+orbitType = 'ISS_short';
+
 % Define global parameters  
 Earth.mu = 3.986*10^14;      % Gravitational parameter of Earth [m^3/s^2]
 Earth.radius = 6378*10^3;    % Radius of Earth [m]
@@ -10,6 +12,7 @@ mission.StartDate = datetime(2021, 1, 26, 0, 0, 0);
 
 % Keplerian orbital elements for the CubeSat at the mission.StartDate.
 mission.CubeSat.EpochDate = datetime(2021, 1, 26, 0, 0, 0);
+
 mission.CubeSat.SemiMajorAxis  = 6786233.13; % [m]
 mission.CubeSat.Eccentricity   = 0.0010537;
 mission.CubeSat.Inclination    = 51.7519;    % [deg]
@@ -22,10 +25,11 @@ mission.CubeSat.Euler = [0 0 0];             % [deg]
 mission.CubeSat.AngularRate = [0 0 0];       % [deg/s]
 
 % Simulation duration for 1 orbit
-% mission.Period = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); %[s]
+mission.Period = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); %[s]
 % mission.Duration  = hours(mission.Period/3600);
 
 mission.Duration  = hours(0.25);
+mission.Timestep  = 0.1;
 
 % Open simulaiton
 mission.mdl = "CubeSat_model";
@@ -56,10 +60,10 @@ set_param(mission.CubeSat.blk, ...
     "constraintCoord", "ECI Axes", ...
     "secondRefExt", "Dialog");
 
-% For best performance and accuracy when using a numerical propagator, use a variable-step solver.
+% For best performance and accuracy when using a numerical propagator
 set_param(mission.mdl, ...
     "SolverType", "Fixed-step", ...
-    "FixedStep",  "0.1",...
+    "FixedStep",  string(mission.Timestep),...
     "RelTol",     "1e-6", ...
     "AbsTol",     "1e-7", ...
     "StopTime",  string(seconds(mission.Duration)));
@@ -76,12 +80,12 @@ set_param(mission.mdl, ...
 
 % Run the Model and Collect Satellite Ephemerides
 mission.SimOutput = sim(mission.mdl);
-save('Data/orbitSimOutput.mat','mission');
+
+save(['Data/' orbitType '/orbitSimOutput_' orbitType '.mat'],'mission');
 
 %% Create a txt with simulator output data
+spirent(mission,orbitType);
 disp('data saved')
-spirent(mission)
-
 
 
 
