@@ -2,7 +2,7 @@
 clc; clear; close all; 
 
 orbitType = 'ISS_nodrag';
-mission.mdl = "CubeSat_model";
+mission.mdl = "CubeSatModel_noperturbations";
 Resultspath = 'Data/ModelComparison/';
 
 % Define global parameters  
