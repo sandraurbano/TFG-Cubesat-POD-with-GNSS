@@ -4,7 +4,7 @@
 clc; clear; close all; 
 
 orbitType = 'QB50orbit';
-mission.mdl = "CubesatDynamicsModel";
+mission.mdl = "CubeSatModel_pert";
 Resultspath = 'Data/QB50/';
 
 % CENTRAL BODY: EARTH
@@ -139,7 +139,7 @@ set_param(mission.CubeSat.Dynamicsblk, ...
 
 %% ATTITUDE PROFILE BLOCK
 % Define the path to the Attitude Profile block in the model.
-mission.CubeSat.Attitudeblk = mission.mdl + "/Attitude Profile";
+mission.CubeSat.Attitudeblk = mission.mdl + "/Attitude Profile (NADIR Pointing)";
 
 % Define parameters
 set_param(mission.CubeSat.Attitudeblk, ...
