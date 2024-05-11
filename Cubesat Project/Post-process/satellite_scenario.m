@@ -12,7 +12,7 @@ load(CubeSatfile);
 % SATELLITE SCENARIO DEFINITION
 % Define the time period of the simulation for the satellite scenario
 startTime = mission.StartDate;                      
-stopTime = mission.StartDate + mission.Duration;                        
+stopTime = mission.EndDate;                
 sampleTime = mission.Timestep;                                      
 
 scenario = satelliteScenario(startTime,stopTime,sampleTime);
