@@ -12,8 +12,9 @@ endTime = seconds(cubesat.Duration);
 indices_gps = strcmp(spirent.satData.Sat_type, Type);
 spirent.satData = structfun(@(x) x(indices_gps, :), spirent.satData, 'UniformOutput', false);
 
+%%%%%%%%%%%%%%%%%%%%%%%% SPIRENT %%%%%%%%%%%%%%%%%%%%%%%%
 
-%% SPIRENT SATELLITE VISIBILITY 
+% SPIRENT SATELLITE VISIBILITY 
 
 figure
 scatter(spirent.satData.Time_ms, spirent.satData.Sat_PRN, 'b.'); 
@@ -35,7 +36,7 @@ xlim([0 spirent.satData.Time_ms(end)])
 
 
 
-%% SPIRENT NUMBER OF SATELLITES IN VIEW
+% SPIRENT NUMBER OF SATELLITES IN VIEW
 
 unique_t = unique(spirent.satData.Time_ms);
 numvis = zeros(size(unique_t));
@@ -58,9 +59,15 @@ xtickLabels = arrayfun(@(x) sprintf('%i', x), tickPositions, 'UniformOutput', fa
 set(gca, 'XTickLabel', xtickLabels);
 xlim([0 unique_t(end)])
 
+% SPIRENT SKYPLOT
+[allAz, allEl, satIDs] = skyplot_data(spirent,Type);
 
+figure
+sp = skyplot(allAz, allEl, string(satIDs));
+title('Spirent - Skyplot');
 
-%% GNSS SATELLITE VISIBILITY 
+%%%%%%%%%%%%%%%%%%%%%%%% GNSS-SDR %%%%%%%%%%%%%%%%%%%%%%%%
+% GNSS SATELLITE VISIBILITY 
 
 figure
 hold on
@@ -80,7 +87,7 @@ legend('ch1','ch2','ch3','ch4','ch5','ch6','ch7','Location','eastoutside')
 idPRN = unique(GnssSDR.obs.PRN);
 yticks(idPRN)
 
-%% GNSS NUMBER OF SATELLITES IN VIEW
+% GNSS NUMBER OF SATELLITES IN VIEW
 
 % GnssSDR.obs = load(GnssSDR.Path.obs);
 % 
