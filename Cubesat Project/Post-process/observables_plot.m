@@ -1,6 +1,11 @@
 function observables_plot(spirent,gnssSDR,Type,cubesat)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% Aim: Create a dopplers plot that compares GNSS-SDR and Spirent data
+%
+% INPUT  --> spirent: struct that contains satellite data from Spirent
+%            gnssSDR: struct that contains obervables data from GNSS-sdr
+%            Type: string with the constellation type (e.g. 'GPS')  
+%            cubesat: struct that constains the simulation data and simulink output   
+% OUTPUT --> figure: dopplers plot
 
 startTime = 0;
 endTime = seconds(cubesat.Duration);

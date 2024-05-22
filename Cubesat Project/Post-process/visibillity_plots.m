@@ -1,6 +1,12 @@
 function visibillity_plots(cubesat,GnssSDR,spirent,Type)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% Aim: Creates visibillity plots from Spirent and GNSS-SDR data
+%
+% INPUT  --> cubesat: struct that constains the simulation data and simulink output 
+%            GnssSDR: struct that contains position, velocity an time data from GNSS-sdr
+%            spirent: struct that contains satellite data from Spirent
+%            Type: string with the constellation type (e.g. 'GPS')            
+% OUTPUT --> figures: satellite visibillity, number of satellites in view
+%            and skyplot
 
 
 % Simulation time of the orbit propagator ~ Period of the orbit

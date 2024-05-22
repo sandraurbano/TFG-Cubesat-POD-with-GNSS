@@ -1,13 +1,13 @@
-
 function Position_plot(PVT,cubesat,spirent)
-% Aim: Creates a position plot
-% INPUT  --> PVT: struct that contains position, velocity an time data from
-%            GNSS-sdr
-% OUTPUT --> figure
+% Aim: Creates a position plot using GNSS-SDR data
+%
+% INPUT  --> PVT: struct that contains position, velocity and time data from GNSS-sdr
+%            cubesat: struct that constains the simulation data and simulink output 
+%            spirent: struct that contains satellite data from Spirent
+% OUTPUT --> figure: Lat-Lon and 3D Position in ECEF
 
 startTime = 0;
 endTime = seconds(cubesat.Duration);
-
 
 Lon  = PVT.longitude;
 Lat = PVT.latitude;

@@ -6,14 +6,14 @@ function animatedTRK_plot(trk,samplingFreq)
 
     trk.PRN_start_time_s = trk.PRN_start_sample_count/samplingFreq;
     iterations = length(trk.PRN_start_sample_count);
-
-    % v = VideoWriter('Results\animatedTRK.avi');
-    % open(v)
+    M(iterations) = struct('cdata',[],'colormap',[]); 
 
     fig = figure;
-    set(fig, 'visible','off');
     set(fig, 'defaultAxesFontSize', 10);  
     set(fig, 'WindowState', 'maximized');
+    axis tight manual
+    ax = gca;
+    ax.NextPlot = 'replaceChildren';
 
     % SUBPLOT1: Discrete Time Scatter plot
     subplot(3,3,1)
@@ -97,8 +97,12 @@ function animatedTRK_plot(trk,samplingFreq)
     xlabel('RX Time [s]')
     grid on
 
+    %fig.Visible = 'off';
+
     % Animate
-    for i = 1:iterations
+    tic
+    for i = 1:10:iterations
+        tic
         main_title = sprintf('Tracking plot: SAT %d, Elevation %d, Doppler %d', trk.PRN(i),i,i);
         
         set(subplot1_newpts, 'XData', trk.Prompt_I(i), 'YData', trk.Prompt_Q(i));
@@ -127,11 +131,11 @@ function animatedTRK_plot(trk,samplingFreq)
         set(subplot7_allpts, 'XData', trk.PRN_start_time_s(j), 'YData', trk.code_error_filt_chips(j));
     
         sgtitle(main_title);
-        % drawnow limitrate
-
-        %frame(i) = getframe(fig);
-
+        drawnow limitrate
+        %M(i) = getframe(gcf);
+        toc
     end
-    writeVideo(v,frame);
-    close(v)
+    toc
+    fig.Visible = 'on';
+    movie(M);
 end

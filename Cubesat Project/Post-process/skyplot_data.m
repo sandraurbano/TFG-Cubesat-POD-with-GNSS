@@ -1,4 +1,11 @@
 function [allAz, allEl, satIDs] = skyplot_data(spirent,Type)
+% Aim: Filter the data to obtain azimuth and elevation angles of each GNSSsat
+%
+% INPUT  --> spirent: struct that contains satellite data from Spirent
+%            Type: string with the constellation type (e.g. 'GPS')            
+% OUTPUT --> allAz: array with azimuth angles in deg (size:epochs x satIDs)
+%            allEl: array with elevation angles in deg (size:epochs x satIDs)
+%            satIDs: vector with the PRN of each satellite
 
     % SPIRENT
     idx_gps = strcmp(spirent.satData.Sat_type, Type);

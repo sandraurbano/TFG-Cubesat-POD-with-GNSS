@@ -1,8 +1,10 @@
 function Tracking_plot(trk,channels,samplingFreq)
 % Aim: Creates a tracking plot
-% INPUT  --> trk: structure that contains the data of tracking for and
-%            specific channel
-% OUTPUT --> figure
+%
+% INPUT  --> trk: structure that contains tracking data from GNSS-sdr
+%            channels: number of channels using
+%            samplingFreq: sampling frequency used for the reception of data
+% OUTPUT --> figure: tracking plot
 
 
 for N=1:channels
@@ -10,7 +12,7 @@ for N=1:channels
     trk(N).PRN_start_time_s = trk(N).PRN_start_sample_count/samplingFreq;
     
     figure
-    set(gcf, 'Position', get(0, 'Screensize'));
+    %set(gcf, 'Position', get(0, 'Screensize'));
     sgtitle(sprintf('Tracking data channel %i',N));
      
     

@@ -1,6 +1,12 @@
 function PVTplots(PVT,spirent,Type,cubesat)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Aim: Creates a position and velocity plot to compare Spirent and GNSS-SDR data
+%
+% INPUT  --> PVT: struct that contains position, velocity and time data from GNSS-sdr
+%            spirent: struct that contains satellite data from Spirent
+%            Type: string with the constellation type (e.g. 'GPS')
+%            cubesat: struct that constains the simulation data and simulink output 
+% OUTPUT --> figures: LonLat - HeightLat, PosXy-PosXZ and VelXY-VelXZ 
+
 
 startTime = 0;
 endTime = seconds(cubesat.Duration);
@@ -12,10 +18,10 @@ indices_gps = strcmp(spirent.satData.Sat_type, Type);
 % Identify the max number of GPS satellites
 spirent.satData = structfun(@(x) x(indices_gps, :), spirent.satData, 'UniformOutput', false);
 
+
 t_spirent = spirent.motion.Time_ms*10^-3;
 
 % linspace(startTime,endTime,length(spirent.motion.Pos_X));
-
 t_gnssSDR = PVT.TOW_at_current_symbol_ms*10^-3;
 
 % linspace(startTime,endTime,length(PVT.pos_x));

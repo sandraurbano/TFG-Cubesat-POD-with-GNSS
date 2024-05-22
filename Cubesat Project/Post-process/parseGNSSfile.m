@@ -1,14 +1,11 @@
-
-
 function [navmsg,satIDs] = parseGNSSfile(gnssFileType,file)
 % Aim: obtain the initial satellite orbital parameters and satellite IDs 
 % from the GNSS file, based on the file type.
 %
-% Input:  --> gnssFileType: 'RINEX', 'SEM', or 'YUCA'
-%         --> file: string with the name of the file
-%
-% Output: --> navmsg: data of the file 
-%         --> satIDs: satellite IDs 
+% INPUT  --> gnssFileType: 'RINEX', 'SEM', or 'YUCA'
+%            file: string with the name of the file
+% OUTPUT --> navmsg: data of the file 
+%            satIDs: satellite IDs 
 
     switch gnssFileType
         case "RINEX"
