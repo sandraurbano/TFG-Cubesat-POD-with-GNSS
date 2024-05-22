@@ -22,54 +22,45 @@ spirent.satData = structfun(@(x) x(indices_gps, :), spirent.satData, 'UniformOut
 
 % SPIRENT SATELLITE VISIBILITY 
 
+% Define time vector in datetime format
+dt = seconds(spirent.satData.Time_ms*10^-3);
+t = cubesat.StartDate + dt;
+
 figure
-scatter(spirent.satData.Time_ms, spirent.satData.Sat_PRN, 'b.'); 
+scatter(t, spirent.satData.Sat_PRN, 'b.'); 
 title('Spirent - Satellite visibility');
-xlabel('Time (s)'); 
 ylabel('Sat PRN'); 
-grid on;
-
-% Plot tick labels 
+grid on; 
 idPRN = unique(spirent.satData.Sat_PRN);
-numTicks = 10; 
-tickPositions = linspace(startTime, endTime, numTicks);
-
 yticks(idPRN)
-xtickPositions = get(gca, 'XTick');
-xtickLabels = arrayfun(@(x) sprintf('%i', x), tickPositions, 'UniformOutput', false);
-set(gca, 'XTickLabel', xtickLabels);
-xlim([0 spirent.satData.Time_ms(end)])
 
 
 
 % SPIRENT NUMBER OF SATELLITES IN VIEW
 
-unique_t = unique(spirent.satData.Time_ms);
-numvis = zeros(size(unique_t));
+% Get unique times in milliseconds and convert to datetime 
+unique_t_ms = unique(spirent.satData.Time_ms);
+unique_t = cubesat.StartDate + seconds(unique_t_ms * 1e-3);
 
-for i = 1:length(unique_t)
-    numvis(i) = sum(spirent.satData.Time_ms == unique_t(i));
-end
+% Use histcounts to count occurrences of each unique time
+edges = [unique_t_ms; unique_t_ms(end)+1];
+numvis = histcounts(spirent.satData.Time_ms, edges);
 
 figure
 plot(unique_t, numvis, 'b-');
-%area(unique_t,numvis)
-xlabel('Time (s)');
+xlabel('Time');
 ylabel('Number of satellites');
 title('Spirent - Number of GPS satellites visible');
 grid on;
 yticks(0:1:max(numvis)); 
-ylim([0 max(numvis)])
-xtickPositions = get(gca, 'XTick');
-xtickLabels = arrayfun(@(x) sprintf('%i', x), tickPositions, 'UniformOutput', false);
-set(gca, 'XTickLabel', xtickLabels);
-xlim([0 unique_t(end)])
+ylim([0 max(numvis)]);
+
 
 % SPIRENT SKYPLOT
 [allAz, allEl, satIDs] = skyplot_data(spirent,Type);
 
 figure
-sp = skyplot(allAz, allEl, string(satIDs));
+skyplot(allAz, allEl, string(satIDs));
 title('Spirent - Skyplot');
 
 %%%%%%%%%%%%%%%%%%%%%%%% GNSS-SDR %%%%%%%%%%%%%%%%%%%%%%%%
