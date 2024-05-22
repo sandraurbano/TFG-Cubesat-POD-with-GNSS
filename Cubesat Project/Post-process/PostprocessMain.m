@@ -53,15 +53,16 @@ for ch=1:channels
 end 
 
 % Define path for Results
-results_path = 'Results/QB50/2024_05_13/';
+date = string(datetime('now','Format','yyyy_MM_dd'));
+results_path = fullfile('Results\QB50\', date, '\');
 
 %% SATELLITE SCENARIO
 % satellite scenario, skyplot and visibility chart
 % satellite_scenario(CubeSatfile,GnssSDR.Path.rnx_Nav);
 
 %% POSITION 
-Position_plot(GnssSDR.PVT,simulinkSim.mission,spirent);
-PVTplots(GnssSDR.PVT,spirent,ConstellationType,simulinkSim.mission);
+Position_plot(GnssSDR.PVT,simulinkSim.mission,results_path);
+PVTplots(GnssSDR.PVT,spirent,ConstellationType,simulinkSim.mission,results_path);
 
 %% KML
 KML_plot(GnssSDR.Path.KML);
@@ -70,12 +71,12 @@ KML_plot(GnssSDR.Path.KML);
 % POD_plot(GnssSDR.PVT,spirent,ConstellationType,simulinkSim.mission);
 
 %% TRACKING 
-Tracking_plot(GnssSDR.trk,channels,samplingFreq);
+Tracking_plot(GnssSDR.trk,channels,samplingFreq,results_path);
 % animatedTRK_plot(GnssSDR.trk(1),samplingFreq);
 
 %% OBSERVABLES
-observables_plot(spirent,GnssSDR.obs,ConstellationType,simulinkSim.mission)
-visibillity_plots(simulinkSim.mission,GnssSDR,spirent,ConstellationType)
+observables_plot(spirent,GnssSDR.obs,ConstellationType,simulinkSim.mission,results_path)
+visibillity_plots(simulinkSim.mission,GnssSDR,spirent,ConstellationType,results_path)
 
 %% ADQUISITION
 % adquistion_plot()

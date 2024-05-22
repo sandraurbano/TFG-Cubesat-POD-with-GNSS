@@ -1,10 +1,11 @@
-function PVTplots(PVT,spirent,Type,cubesat)
+function PVTplots(PVT,spirent,Type,cubesat,results_path)
 % Aim: Creates a position and velocity plot to compare Spirent and GNSS-SDR data
 %
 % INPUT  --> PVT: struct that contains position, velocity and time data from GNSS-sdr
 %            spirent: struct that contains satellite data from Spirent
 %            Type: string with the constellation type (e.g. 'GPS')
-%            cubesat: struct that constains the simulation data and simulink output 
+%            cubesat: struct that constains the simulation data and simulink output
+%            results_path: string with the path of the results folder
 % OUTPUT --> figures: LonLat - HeightLat, PosXy-PosXZ and VelXY-VelXZ 
 
 
@@ -29,8 +30,10 @@ recPos_gnssSDR = [PVT.pos_x; PVT.pos_y; PVT.pos_z];
 velPos_gnssSDR = [PVT.vel_x; PVT.vel_y; PVT.vel_z];
 
 
-
+% Plot position in geodetic
 figure
+set(gcf,'WindowState','maximized');
+
 subplot(1,2,1)
 hold on
 scatter(rad2deg(spirent.motion.Lat),rad2deg(spirent.motion.Long),10,'*');
@@ -51,28 +54,13 @@ xlabel('Lat [deg]')
 grid on
 legend('Spirent', 'Gnss SDR');
 
-figure
-subplot(1,2,1)
-hold on
-scatter(spirent.motion.Vel_X,spirent.motion.Vel_Y,10,'*');
-scatter(PVT.vel_x,PVT.vel_y,8,'filled');
-title('$\textbf{Velocity XY}$')
-ylabel('VelY [m/s]')
-xlabel('VelX [m/s]')
-grid on
-legend('Spirent', 'Gnss SDR');
+filename = fullfile(results_path, 'pos_geodetic.png');
+saveas(gcf, filename);
 
-subplot(1,2,2)
-hold on
-scatter(spirent.motion.Vel_X,spirent.motion.Vel_Z,10,'*');
-scatter(PVT.vel_x,PVT.vel_z,8,'filled');
-title('$\textbf{Velocity XZ}$')
-ylabel('VelZ [m/s]')
-xlabel('VelX [m/s]')
-grid on
-legend('Spirent', 'Gnss SDR');
-
+% Plot position in ECEF
 figure
+set(gcf,'WindowState','maximized');
+
 subplot(1,2,1)
 hold on
 scatter(spirent.motion.Pos_X,spirent.motion.Pos_Y,10,'*');
@@ -93,6 +81,36 @@ xlabel('PosX [m]')
 grid on
 legend('Spirent', 'Gnss SDR');
 
+filename = fullfile(results_path, 'pos_ecef.png');
+saveas(gcf, filename);
+
+
+% Plot velocity in ECEF
+figure
+set(gcf,'WindowState','maximized');
+
+subplot(1,2,1)
+hold on
+scatter(spirent.motion.Vel_X,spirent.motion.Vel_Y,10,'*');
+scatter(PVT.vel_x,PVT.vel_y,8,'filled');
+title('$\textbf{Velocity XY}$')
+ylabel('VelY [m/s]')
+xlabel('VelX [m/s]')
+grid on
+legend('Spirent', 'Gnss SDR');
+
+subplot(1,2,2)
+hold on
+scatter(spirent.motion.Vel_X,spirent.motion.Vel_Z,10,'*');
+scatter(PVT.vel_x,PVT.vel_z,8,'filled');
+title('$\textbf{Velocity XZ}$')
+ylabel('VelZ [m/s]')
+xlabel('VelX [m/s]')
+grid on
+legend('Spirent', 'Gnss SDR');
+
+filename = fullfile(results_path, 'vel_ecef.png');
+saveas(gcf, filename);
 
 
 

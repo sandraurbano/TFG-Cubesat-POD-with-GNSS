@@ -1,10 +1,11 @@
-function visibillity_plots(cubesat,GnssSDR,spirent,Type)
+function visibillity_plots(cubesat,GnssSDR,spirent,Type,results_path)
 % Aim: Creates visibillity plots from Spirent and GNSS-SDR data
 %
 % INPUT  --> cubesat: struct that constains the simulation data and simulink output 
 %            GnssSDR: struct that contains position, velocity an time data from GNSS-sdr
 %            spirent: struct that contains satellite data from Spirent
-%            Type: string with the constellation type (e.g. 'GPS')            
+%            Type: string with the constellation type (e.g. 'GPS') 
+%            results_path: string with the path of the results folder
 % OUTPUT --> figures: satellite visibillity, number of satellites in view
 %            and skyplot
 
@@ -26,13 +27,17 @@ spirent.satData = structfun(@(x) x(indices_gps, :), spirent.satData, 'UniformOut
 dt = seconds(spirent.satData.Time_ms*10^-3);
 t = cubesat.StartDate + dt;
 
+
 figure
+set(gcf,'WindowState','maximized');
 scatter(t, spirent.satData.Sat_PRN, 'b.'); 
 title('Spirent - Satellite visibility');
 ylabel('Sat PRN'); 
 grid on; 
 idPRN = unique(spirent.satData.Sat_PRN);
 yticks(idPRN)
+filename = fullfile(results_path, 'spirent_satellite_visibility.png');
+saveas(gcf, filename);
 
 
 
@@ -47,6 +52,7 @@ edges = [unique_t_ms; unique_t_ms(end)+1];
 numvis = histcounts(spirent.satData.Time_ms, edges);
 
 figure
+set(gcf,'WindowState','maximized');
 plot(unique_t, numvis, 'b-');
 xlabel('Time');
 ylabel('Number of satellites');
@@ -54,19 +60,26 @@ title('Spirent - Number of GPS satellites visible');
 grid on;
 yticks(0:1:max(numvis)); 
 ylim([0 max(numvis)]);
+filename = fullfile(results_path, 'spirent_num_visible_satellites.png');
+saveas(gcf, filename);
+
 
 
 % SPIRENT SKYPLOT
 [allAz, allEl, satIDs] = skyplot_data(spirent,Type);
 
 figure
+set(gcf,'WindowState','maximized');
 skyplot(allAz, allEl, string(satIDs));
 title('Spirent - Skyplot');
+filename = fullfile(results_path, 'spirent_skyplot.png');
+saveas(gcf, filename);
 
 %%%%%%%%%%%%%%%%%%%%%%%% GNSS-SDR %%%%%%%%%%%%%%%%%%%%%%%%
 % GNSS SATELLITE VISIBILITY 
 
 figure
+set(gcf,'WindowState','maximized');
 hold on
 
 for i=1:size(GnssSDR.obs.PRN,1)
@@ -79,10 +92,10 @@ xlabel('TOW (s)');
 ylabel('Sat PRN'); 
 grid on;
 legend('ch1','ch2','ch3','ch4','ch5','ch6','ch7','Location','eastoutside')
-
-% Plot tick labels - yaxis 
 idPRN = unique(GnssSDR.obs.PRN);
 yticks(idPRN)
+filename = fullfile(results_path, 'gnsssdr_satellite_visibility.png');
+saveas(gcf, filename);
 
 % GNSS NUMBER OF SATELLITES IN VIEW
 

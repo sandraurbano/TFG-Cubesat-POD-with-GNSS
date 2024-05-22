@@ -1,10 +1,11 @@
-function observables_plot(spirent,gnssSDR,Type,cubesat)
+function observables_plot(spirent,gnssSDR,Type,cubesat,results_path)
 % Aim: Create a dopplers plot that compares GNSS-SDR and Spirent data
 %
 % INPUT  --> spirent: struct that contains satellite data from Spirent
 %            gnssSDR: struct that contains obervables data from GNSS-sdr
 %            Type: string with the constellation type (e.g. 'GPS')  
-%            cubesat: struct that constains the simulation data and simulink output   
+%            cubesat: struct that constains the simulation data and simulink output 
+%            results_path: string with the path of the results folder
 % OUTPUT --> figure: dopplers plot
 
 startTime = 0;
@@ -28,7 +29,8 @@ num_rows = ceil(sqrt(maxSats));
 num_cols = ceil(maxSats / num_rows);
 
 figure
-set(gcf, 'Position', get(0, 'Screensize'));
+set(gcf,'WindowState','maximized');
+
 sgtitle('Doppler frequency Group A');
 
 for i = 1:length(PRN_common)
@@ -65,10 +67,9 @@ for i = 1:length(PRN_common)
     ax.YAxis.Exponent = 0;
     grid on
 
-
-
 end
 
-
+filename = fullfile(results_path, 'doppler.png');
+saveas(gcf, filename);
 
 end 
