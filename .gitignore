@@ -26,8 +26,9 @@ slprj/
 sccprj/
 codegen/
 
-# DATA folder
+# Data and Results folders
 Data/
+Results/
 
 # Cache files
 *.slxc
