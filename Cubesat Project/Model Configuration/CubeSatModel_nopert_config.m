@@ -1,39 +1,51 @@
 
+% CUBESAT MODEL WITHOUT PERTURBATIONS CONFIGURATION FILE
+% This file aims to define the parameters needed for the simulink 
+% CubeSatModel_nopert.slx. This model simulate a 1U cubesat of 1.33kg.
+
+% Thesis Title: GNSS-Based Navigation Method for POD in CubeSats
+% AUTHOR: Sandra Urbano Rodriguez
+% DATE: June, 2024
+
 clc; clear; close all; 
 
-orbitType = 'ISS_nodrag';
-mission.mdl = "CubeSatModel_noperturbations";
-Resultspath = 'Data/ModelComparison/';
+% Simulink model name
+mission.mdl = "CubeSatModel_nopert";
 
+%% CENTRAL BODY: EARTH
 % Define global parameters  
-Earth.mu = 3.986*10^14;      % Gravitational parameter of Earth [m^3/s^2]
-Earth.radius = 6378*10^3;    % Radius of Earth [m]
+Earth.mu = 3.986*10^14;      % [m^3/s^2]
+Earth.radius = 6378*10^3;    % [m]
 
-% Define simulation start date
-mission.StartDate = datetime(2020, 1, 1, 0, 0, 0);
+%% CUBESAT: QBITO 
 
-% Keplerian orbital elements for the CubeSat at the mission.StartDate.
-mission.CubeSat.EpochDate = datetime(2020, 1, 1, 0, 0, 0);
+% Define Keplerian orbital elements
+% QB50 orbit
+mission.CubeSat.EpochDate   =   datetime(2014, 6, 15, 01, 05, 35); 
+mission.CubeSat.Altitude         = 330*10^3;
+mission.CubeSat.SemiMajorAxis    = Earth.radius + mission.CubeSat.Altitude; % [m]
+mission.CubeSat.Eccentricity     = 0; % [-]
+mission.CubeSat.Inclination      = 79; % [deg]
+mission.CubeSat.RAAN             = 250;  % [deg]
+mission.CubeSat.ArgOfPeriapsis   = 0; % [deg]
+mission.CubeSat.TrueAnomaly      = 35; % [deg]
 
-mission.CubeSat.SemiMajorAxis  = 6786233.13; % [m]
-mission.CubeSat.Eccentricity   = 0.0010537;
-mission.CubeSat.Inclination    = 51.7519;    % [deg]
-mission.CubeSat.RAAN           = 95.2562;    % [deg]
-mission.CubeSat.ArgOfPeriapsis = 93.4872;    % [deg]
-mission.CubeSat.TrueAnomaly    = 202.9234;   % [deg]
+% Define cubeSat attitude
+mission.CubeSat.Euler = [0 0 0];         % [deg]
+mission.CubeSat.AngularRate = [0 0 0];   % [deg/s]
 
-% CubeSat attitude at the mission.StartDate.
-mission.CubeSat.Euler = [0 0 0];             % [deg]
-mission.CubeSat.AngularRate = [0 0 0];       % [deg/s]
-
-% Simulation duration for 1 orbit
-mission.Period = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); %[s]
+%% SIMULATION
+% Define StartDate and time of duration for the simulation: 1 orbit
+mission.StartDate = datetime(2014, 6, 15, 12, 0, 0);
+mission.Period    = 2*pi*sqrt(mission.CubeSat.SemiMajorAxis^3/Earth.mu); 
 mission.Duration  = hours(mission.Period/3600);
+mission.EndDate   = mission.StartDate + mission.Duration;
 mission.Timestep  = 0.5;
 
 % Open simulaiton
 open_system(mission.mdl);
 
+%% CUBESAT VEHICLE BLOCK
 % Define the path to the CubeSat Vehicle block in the model.
 mission.CubeSat.blk = mission.mdl + "/CubeSat Vehicle";
 
@@ -51,15 +63,19 @@ set_param(mission.CubeSat.blk, ...
 
 % Set CubeSat attitude initial conditions
 set_param(mission.CubeSat.blk, ...
-    "euler",  "mission.CubeSat.Euler", ...
-    "pqr", "mission.CubeSat.AngularRate", ...
-    "pointingMode", "Earth (Nadir) Pointing", ...
-    "firstAlignExt",  "Dialog", ...
-    "secondAlignExt",   "Dialog", ...
-    "constraintCoord", "ECI Axes", ...
-    "secondRefExt", "Dialog");
+    euler           = "mission.CubeSat.Euler", ...
+    pqr             = "mission.CubeSat.AngularRate", ...
+    pointingMode    = "Earth (Nadir) Pointing", ...
+    firstAlignExt   = "Dialog", ...
+    firstAlign      = "[0 0 1]", ...
+    secondAlignExt  = "Dialog", ...
+    secondAlign     = "[0 1 0]", ...
+    constraintCoord = "ECI Axes", ...
+    secondRefExt    = "Dialog",...
+    secondRef       = "[0 0 1]");
 
-% For best performance and accuracy when using a numerical propagator
+%% PROPAGATOR
+% Define propagator properties
 set_param(mission.mdl, ...
     "SolverType", "Fixed-step", ...
     "FixedStep",  string(mission.Timestep),...
@@ -67,20 +83,28 @@ set_param(mission.mdl, ...
     "AbsTol",     "1e-7", ...
     "StopTime",  string(seconds(mission.Duration)));
 
-% Save model output port data as a dataset of time series objects.
+%% SIMULATION OUTPUT
+% Define otuput properties
 set_param(mission.mdl, ...
     "SaveOutput", "on", ...
     "OutputSaveName", "yout", ...
     "SaveFormat", "Dataset",...
     "DatasetSignalFormat", "timeseries");
 
+% Define output paths
+Resultspath = "Data/ModelComparison/";
+filename    = "SimOutput_QB50_nopert_final.mat";
+filepath = fullfile(Resultspath,filename);
+
+
+%% RUN SIMULATION AND SAVE DATA
 % Run the Model and Collect Satellite Ephemerides
 mission.SimOutput = sim(mission.mdl);
-save([Resultspath 'orbitSimOutput_' orbitType '.mat'],'mission');
+save(filepath,'mission');
 
-%% Create a txt with simulator output data
-spirent(mission,orbitType,Resultspath);
-disp('data saved')
+% Create a txt with simulator output data
+spirent(mission,orbitType,Resultspath); 
+disp('Spirent data saved')
 
 
 
