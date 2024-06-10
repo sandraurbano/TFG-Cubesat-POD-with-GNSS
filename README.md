@@ -17,7 +17,7 @@ The main folders in this repository are organized as follows:
 ### Getting Started
 To get started with using the resources in this repository, follow these steps:
 1. Clone this repository to your local machine.
-2. Download the data folder from this link: [link]
+2. Download the data folder from this [link](https://www.dropbox.com/scl/fo/3ypcls3egmj5x04p1lepk/AFZdddypuZBz0udkaQiAP8A?rlkey=8oo185ss8x7thx82co5pj3gd0&st=yzbf81yr&dl=0)
 3. Create a folder name Results
 4. Navigate to the desired folder based on your interest (e.g., Cubesat Model, Post-processing).
    - If you want to propagate an orbit, open Model Configuration folder and run one of the configuration scripts (With or without perturbation)
