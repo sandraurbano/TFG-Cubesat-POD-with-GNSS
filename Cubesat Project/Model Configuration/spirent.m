@@ -1,5 +1,9 @@
-function spirent(mission,name,Resultspath)
-% Create a txt with simulator output data
+function spirent(mission,Resultspath)
+% Aim: Creates a txt in Spirent format from Simulink output
+%
+% INPUT  --> mission: struct that constains the simulation data and simulink output 
+%            results_path: string with the path where the file is going to be saved
+% OUTPUT --> file: spirent txt
 
 %% Process Data for Spirent
 Data.t = mission.SimOutput.yout{6}.Values.Time; %[s]
@@ -16,8 +20,6 @@ V1 = repmat({'v1_M1'}, 1, length(Data.t));
 T = table(Data.t,MOT', V1', Data.PosECEF(:,1), Data.PosECEF(:,2) , Data.PosECEF(:,3),...
     Data.Vel(:,1), Data.Vel(:,2), Data.Vel(:,3));
 
-% Write the table to a txt file
-file = [Resultspath 'Cubesat_PosECEF_Vel_' name '.txt'];
-writetable(T,file,'WriteMode','overwrite');
+writetable(T,Resultspath,'WriteMode','overwrite');
 
 end
