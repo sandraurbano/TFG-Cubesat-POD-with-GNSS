@@ -7,7 +7,7 @@ function Tracking_plot(trk,channels,samplingFreq,results_path)
 %            results_path: string with the path of the results folder
 % OUTPUT --> figure: tracking plot
 
-
+% creates a tracking plot for each channel
 for N=1:channels
 
     trk(N).PRN_start_time_s = trk(N).PRN_start_sample_count/samplingFreq;
