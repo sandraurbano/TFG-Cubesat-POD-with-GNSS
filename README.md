@@ -3,7 +3,7 @@
 ## GNSS-Based Navigation Method for Precise Orbit Determination in CubeSats
 
 ### Overview
-This repository contains the code and resources developed as part of the final degree project work titled "GNSS-Based Navigation Method for Precise Orbit Determination in CubeSats". The project aims to investigate the feasibility of using this methods by analyzing the effect of perturbations in LEO region, asses the visbility of GPS satellites for different orbits and determine the precision of this methods.
+This repository contains the code and resources developed as part of the final degree project work titled "GNSS-Based Navigation Method for Precise Orbit Determination in CubeSats". The project aims to investigate the feasibility of using GNSS methods for POD by analyzing the effect of perturbations in LEO region, asses the visbility of GPS satellites for different orbits and determine the precision of this methods.
 
 ### Project Structure
 The main folders in this repository are organized as follows:
