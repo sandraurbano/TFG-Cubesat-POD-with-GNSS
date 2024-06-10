@@ -17,5 +17,9 @@ The main folders in this repository are organized as follows:
 ### Getting Started
 To get started with using the resources in this repository, follow these steps:
 1. Clone this repository to your local machine.
-2. Download the datasets from this link: [link]
-3. Navigate to the desired folder based on your interest (e.g., Cubesat Model, Post-processing).
+2. Download the data folder from this link: [link]
+3. Create a folder name Results
+4. Navigate to the desired folder based on your interest (e.g., Cubesat Model, Post-processing).
+   - If you want to propagate an orbit, open Model Configuration folder and run one of the configuration scripts (With or without perturbation)
+   - If you want to post-process Spirent and GNSS-SDR data, use PostprocessMain.m within Post-processing folder.
+   - If you want to compute the precision error between spirent and GNSS-SDR use POD.m
