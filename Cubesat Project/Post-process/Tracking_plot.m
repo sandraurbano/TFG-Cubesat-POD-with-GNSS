@@ -1,16 +1,19 @@
-function Tracking_plot(trk,channels,samplingFreq)
+function Tracking_plot(trk,channels,samplingFreq,results_path)
 % Aim: Creates a tracking plot
-% INPUT  --> trk: structure that contains the data of tracking for and
-%            specific channel
-% OUTPUT --> figure
+%
+% INPUT  --> trk: structure that contains tracking data from GNSS-sdr
+%            channels: number of channels using
+%            samplingFreq: sampling frequency used for the reception of data
+%            results_path: string with the path of the results folder
+% OUTPUT --> figure: tracking plot
 
-
+% creates a tracking plot for each channel
 for N=1:channels
 
     trk(N).PRN_start_time_s = trk(N).PRN_start_sample_count/samplingFreq;
     
     figure
-    set(gcf, 'Position', get(0, 'Screensize'));
+    set(gcf,'WindowState','maximized');
     sgtitle(sprintf('Tracking data channel %i',N));
      
     
@@ -72,6 +75,9 @@ for N=1:channels
     title('$\textbf{Filtered DLL discriminator}$','FontSize',10)
     xlabel('RX Time [s]')
     grid on
+ 
+    filename = fullfile(results_path, sprintf('trk_ch%i.png',N));
+    saveas(gcf, filename);
 
 
 end 

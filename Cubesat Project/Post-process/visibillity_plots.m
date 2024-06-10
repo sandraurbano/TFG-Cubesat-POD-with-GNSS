@@ -1,6 +1,13 @@
-function visibillity_plots(cubesat,GnssSDR,spirent,Type)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+function visibillity_plots(cubesat,GnssSDR,spirent,channels, Type,results_path)
+% Aim: Creates visibillity plots from Spirent and GNSS-SDR data
+%
+% INPUT  --> cubesat: struct that constains the simulation data and simulink output 
+%            GnssSDR: struct that contains position, velocity an time data from GNSS-sdr
+%            spirent: struct that contains satellite data from Spirent
+%            Type: string with the constellation type (e.g. 'GPS') 
+%            results_path: string with the path of the results folder
+% OUTPUT --> figures: satellite visibillity, number of satellites in view
+%            and skyplot
 
 
 % Simulation time of the orbit propagator ~ Period of the orbit
@@ -12,97 +19,82 @@ endTime = seconds(cubesat.Duration);
 indices_gps = strcmp(spirent.satData.Sat_type, Type);
 spirent.satData = structfun(@(x) x(indices_gps, :), spirent.satData, 'UniformOutput', false);
 
+%%%%%%%%%%%%%%%%%%%%%%%% SPIRENT %%%%%%%%%%%%%%%%%%%%%%%%
 
-%% SPIRENT SATELLITE VISIBILITY 
+% SPIRENT SATELLITE VISIBILITY 
+
+% Define time vector in datetime format
+dt = seconds(spirent.satData.Time_ms*10^-3);
+t = cubesat.StartDate + dt;
+
 
 figure
-scatter(spirent.satData.Time_ms, spirent.satData.Sat_PRN, 'b.'); 
-title('Spirent - Satellite visibility');
-xlabel('Time (s)'); 
-ylabel('Sat PRN'); 
-grid on;
-
-% Plot tick labels 
+set(gcf,'WindowState','maximized');
+scatter(t, spirent.satData.Sat_PRN, 'b.'); 
+title('Spirent - Satellite visbility chart');
+ylabel('Satellite PRN Index'); 
+grid on; 
 idPRN = unique(spirent.satData.Sat_PRN);
-numTicks = 10; 
-tickPositions = linspace(startTime, endTime, numTicks);
-
+ylim([min(idPRN)-1 max(idPRN)+1])
 yticks(idPRN)
-xtickPositions = get(gca, 'XTick');
-xtickLabels = arrayfun(@(x) sprintf('%i', x), tickPositions, 'UniformOutput', false);
-set(gca, 'XTickLabel', xtickLabels);
-xlim([0 spirent.satData.Time_ms(end)])
+filename = fullfile(results_path, 'spirent_visibility.png');
+saveas(gcf, filename);
 
 
+% SPIRENT NUMBER OF SATELLITES IN VIEW
 
-%% SPIRENT NUMBER OF SATELLITES IN VIEW
+% Get unique times in milliseconds and convert to datetime 
+unique_t_ms = unique(spirent.satData.Time_ms);
+unique_t = cubesat.StartDate + seconds(unique_t_ms * 1e-3);
 
-unique_t = unique(spirent.satData.Time_ms);
-numvis = zeros(size(unique_t));
-
-for i = 1:length(unique_t)
-    numvis(i) = sum(spirent.satData.Time_ms == unique_t(i));
-end
+% Use histcounts to count occurrences of each unique time
+edges = [unique_t_ms; unique_t_ms(end)+1];
+numvis = histcounts(spirent.satData.Time_ms, edges);
 
 figure
-plot(unique_t, numvis, 'b-');
-%area(unique_t,numvis)
-xlabel('Time (s)');
+%set(gcf,'WindowState','maximized');
+plot(unique_t, numvis, 'b-','LineWidth',1);
 ylabel('Number of satellites');
 title('Spirent - Number of GPS satellites visible');
 grid on;
-yticks(0:1:max(numvis)); 
-ylim([0 max(numvis)])
-xtickPositions = get(gca, 'XTick');
-xtickLabels = arrayfun(@(x) sprintf('%i', x), tickPositions, 'UniformOutput', false);
-set(gca, 'XTickLabel', xtickLabels);
-xlim([0 unique_t(end)])
+ylim([0 max(numvis)+1]);
+filename = fullfile(results_path, 'spirent_num_visible_satellites.png');
+saveas(gcf, filename);
 
 
-
-%% GNSS SATELLITE VISIBILITY 
+% SPIRENT SKYPLOT
+[allAz, allEl, satIDs] = skyplot_data(spirent,Type);
 
 figure
-hold on
+%set(gcf,'WindowState','maximized');
+skyplot(allAz, allEl, string(satIDs));
+title('Spirent - Skyplot');
+filename = fullfile(results_path, 'spirent_skyplot.png');
+saveas(gcf, filename);
 
+
+%%%%%%%%%%%%%%%%%%%%%%%% GNSS-SDR %%%%%%%%%%%%%%%%%%%%%%%%
+% GNSS SATELLITE VISIBILITY 
+
+gpsWeek = GnssSDR.PVT.week(1);
+
+figure
+set(gcf,'WindowState','maximized');
+hold on
 for i=1:size(GnssSDR.obs.PRN,1)
     [~,cols,PRN] = find(GnssSDR.obs.PRN(i,:));
-    TOW = GnssSDR.obs.TOW_at_current_symbol_s(i,cols);
-    scatter(TOW, PRN,50,'.');
+    rx_time = GnssSDR.obs.RX_time(i,cols);
+    utcDatetime = gps2utc(gpsWeek, rx_time);
+    scatter(utcDatetime, PRN,50,'.');
 end 
-title('GNSS-SDR - Satellite visibility');
-xlabel('TOW (s)'); 
-ylabel('Sat PRN'); 
+title('GNSS-SDR - Satellite visbility chart');
+ylabel('Satellite PRN Index'); 
 grid on;
-legend('ch1','ch2','ch3','ch4','ch5','ch6','ch7','Location','eastoutside')
-
-% Plot tick labels - yaxis 
+legend_labels = arrayfun(@(x) ['channel ', num2str(x)], 1:channels, 'UniformOutput', false);
+legend(legend_labels,'Location','eastoutside')
 idPRN = unique(GnssSDR.obs.PRN);
 yticks(idPRN)
-
-%% GNSS NUMBER OF SATELLITES IN VIEW
-
-% GnssSDR.obs = load(GnssSDR.Path.obs);
-% 
-% TOW = unique(GnssSDR.obs.TOW_at_current_symbol_s);
-% TOW = nonzeros(TOW);
-% num_satellites_in_view = zeros(size(TOW));
-% 
-% for i=1:size(GnssSDR.obs.TOW_at_current_symbol_s,1)
-%     for j=1:length(TOW)
-%         [~,idx_c] = find(GnssSDR.obs.TOW_at_current_symbol_s(i,:)==TOW(j));
-%         if GnssSDR.obs.PRN(i,idx_c) ~= 0
-%             num_satellites_in_view(j) = num_satellites_in_view(j) + 1;
-%         end 
-%     end 
-% end 
-% 
-% figure;
-% plot(GnssSDR.obs.TOW_at_current_symbol_s(1, :), num_satellites_in_view);
-% title('Number of Satellites in View vs. Time');
-% xlabel('Time (s)');
-% ylabel('Number of Satellites in View');
-% grid on;
-
+filename = fullfile(results_path, 'gnsssdr_visibility.png');
+saveas(gcf, filename);
 
 end
