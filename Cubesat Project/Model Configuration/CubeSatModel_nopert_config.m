@@ -100,11 +100,11 @@ filepath = fullfile(Resultspath,filename);
 %% RUN SIMULATION AND SAVE DATA
 % Run the Model and Collect Satellite Ephemerides
 mission.SimOutput = sim(mission.mdl);
-save(filepath,'mission');
+%save(filepath,'mission');
 
 % Create a txt with simulator output data
-spirent(mission,orbitType,Resultspath); 
-disp('Spirent data saved')
+spirent(mission,Resultspath); 
+%disp('Spirent data saved')
 
 
 
